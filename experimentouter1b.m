@@ -1,5 +1,6 @@
-function [val,grad]=experimentouter1b(u,al,be,yjs,hs,eps)
+function [val,grad,cis]=experimentouter1b(u,al,be,yjs,hs,eps)
 %attempt to depoissonize experimentouter1
+yjs=yjs(:)';hs=hs(:)';
 if u<0 || u>1 || al<-1 || al>0, val=inf; grad=[nan nan nan]; return; end
 i=(0:100)';
 tp=1/u-1;
@@ -9,7 +10,7 @@ for j=1:length(yjs)
     [x2,q,err]=inneredgesolveb(yjs(j),tp,al,be);
     if err==0, in(:,j)=[q;0;x2]; errs(:,j)=0; else [in(:,j),errs(:,j)]=bfgs2(@(in)experiment7c2(in,yjs(j),i,tp,al,be),fguess(yjs(j),tp,al)'); end%experimentinner1(yjs(j),u,al);
     [~,M,ders]=experiment7b2(in(1,j),in(2,j),in(3,j),yjs(j),i,tp,al,be);
-    if in(2,j)==0, directs([1 3],:)=M([2 3],[1 3])\ders([2 3],:); else directs(:,:,j)=M\ders; end
+    if in(2,j)==0, directs([1 3],:,j)=M([2 3],[1 3])\ders([2 3],:); else directs(:,:,j)=M\ders; end
 end
 if sum(errs)>1e-27, val=inf; grad=[nan nan nan]; return; end
 qs=in(1,:); x1s=in(2,:); x2s=in(3,:);
